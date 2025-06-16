@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Panel Cliente{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-info text-white rounded shadow-sm">
+    <h2>Bienvenido, {{ request.user.username }} (Cliente)</h2>
+    <p>Este es tu panel de cliente.</p>
+    <a href="{% url 'logout' %}" class="btn btn-light">Cerrar sesión</a>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'pedidos' %}" class="btn btn-outline-light">Ver tus pedidos</a>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Panel Administrador{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-primary text-white rounded shadow-sm">
+    <h2>Bienvenido, {{ request.user.username }} (Administrador)</h2>
+    <p>Este es el panel de administración.</p>
+    <a href="{% url 'logout' %}" class="btn btn-light">Cerrar sesión</a>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'pedidos' %}" class="btn btn-outline-light">Ver Pedidos</a>
+</div>
+{% endblock %}
