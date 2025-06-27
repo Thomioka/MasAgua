@@ -64,3 +64,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ROLES = (
+    ('cliente', 'Cliente'),
+    ('administrador', 'Administrador'),
+)
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/'  # o donde quieras redirigir al iniciar sesión
+LOGOUT_REDIRECT_URL = '/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
