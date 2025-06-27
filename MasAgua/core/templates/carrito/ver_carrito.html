@@ -19,9 +19,10 @@
         <tbody>
             {% for item in carrito.items.all %}
             <tr>
-                <td>{% if item.producto.imagen %}
-                    <img src="{{ item.producto.imagen.url }}" class="card-img-top p-3" alt="{{ producto.nombre }}"
-                        style="height: 150px; object-fit: contain;">
+                <td>
+                    {% if item.producto.imagen %}
+                        <img src="{{ item.producto.imagen.url }}" class="card-img-top p-3" alt="{{ producto.nombre }}"
+                             style="height: 150px; object-fit: contain;">
                     {% endif %}
                 </td>
                 <td>{{ item.producto.nombre }}</td>
@@ -43,10 +44,27 @@
         </tfoot>
     </table>
 
-    <div class="text-end">
+    <div class="text-end mt-4">
         <form action="{% url 'webpay_plus_create' %}" method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary">
+
+            <div class="mb-3">
+                <label for="tipo_entrega" class="form-label"><strong>Tipo de entrega:</strong></label>
+                <select class="form-select" id="tipo_entrega" name="tipo_entrega" onchange="toggleDireccion()" required>
+                    <option value="retiro">Retiro en tienda</option>
+                    <option value="despacho">Despacho a domicilio</option>
+                </select>
+            </div>
+
+            <div id="direccion_group" style="display: none;">
+                <div class="mb-2">
+                    <label for="direccion" class="form-label"><strong>Dirección:</strong></label>
+                    <input type="text" id="direccion" name="direccion" class="form-control" placeholder="Escribe tu dirección y presiona Enter">
+                </div>
+                <div id="map" style="height: 300px; width: 100%; border: 1px solid #ccc;"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">
                 <i class="bi bi-credit-card"></i> Pagar con WebPay
             </button>
         </form>
@@ -57,4 +75,71 @@
     </div>
     {% endif %}
 </div>
+
+<!-- Scripts -->
+<script>
+    let map, marker, geocoder;
+    let mapInitialized = false;
+
+    function toggleDireccion() {
+        const tipo = document.getElementById('tipo_entrega').value;
+        const direccionGroup = document.getElementById('direccion_group');
+        direccionGroup.style.display = tipo === 'despacho' ? 'block' : 'none';
+
+        if (tipo === 'despacho' && !mapInitialized) {
+            initMap();
+            mapInitialized = true;
+        }
+    }
+
+    function initMap() {
+        const defaultLocation = { lat: -33.4489, lng: -70.6693 };
+        geocoder = new google.maps.Geocoder();
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: defaultLocation,
+            zoom: 14,
+        });
+
+        marker = new google.maps.Marker({
+            position: defaultLocation,
+            map: map,
+            draggable: true,
+        });
+
+        marker.addListener("dragend", function () {
+            const position = marker.getPosition();
+            geocoder.geocode({ location: position }, function (results, status) {
+                if (status === "OK" && results[0]) {
+                    document.getElementById("direccion").value = results[0].formatted_address;
+                }
+            });
+        });
+
+        map.addListener("click", function (event) {
+            marker.setPosition(event.latLng);
+            geocoder.geocode({ location: event.latLng }, function (results, status) {
+                if (status === "OK" && results[0]) {
+                    document.getElementById("direccion").value = results[0].formatted_address;
+                }
+            });
+        });
+
+        document.getElementById("direccion").addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                const address = this.value;
+                geocoder.geocode({ address: address }, function (results, status) {
+                    if (status === "OK") {
+                        const location = results[0].geometry.location;
+                        map.setCenter(location);
+                        marker.setPosition(location);
+                        document.getElementById("direccion").value = results[0].formatted_address;
+                    }
+                });
+            }
+        });
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArcjibroDjoPSdnqjyPmVfBArgc1-mL8Q&libraries=places" async defer></script>
 {% endblock %}

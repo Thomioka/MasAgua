@@ -11,6 +11,7 @@ from core.decorators import role_required
 from core.forms import PedidoForm, ProductoForm
 from .models import Carrito, ItemCarrito, ItemOrden, Orden, Pedido, Producto
 from django import forms
+from datetime import date
 
 from transbank.webpay.webpay_plus.transaction import Transaction
 from transbank.webpay.webpay_plus.transaction import WebpayOptions
@@ -173,31 +174,46 @@ def eliminar_del_carrito(request, item_id):
 def webpay_plus_create(request):
     carrito = get_object_or_404(Carrito, usuario=request.user, confirmado=False)
     
+    # Obtener dirección desde el formulario
+    direccion = request.POST.get("direccion", "")
+    
+    # Crear Pedido antes de iniciar el pago
+    Pedido.objects.create(
+        cliente=request.user.username,
+        direccion=direccion,
+        fecha_entrega=date.today(),
+        cantidad=1  # Puedes adaptar si hay más lógica para cantidad
+    )
+    
     # Generar buy_order seguro
     timestamp = int(time.time())
     buy_order = f"BO_{timestamp}_{request.user.id}"
 
-    # Crear orden sin depender del ID
+    # Crear orden
     orden = Orden.objects.create(
         usuario=request.user,
         estado='pendiente',
+        direccion=direccion,
         monto_total=carrito.total(),
         buy_order=buy_order
     )
 
+    # Configuración Transbank
     tx = Transaction(WebpayOptions(
         commerce_code=settings.TRANSBANK_CONFIG['WEBPAY_COMMERCE_CODE'],
         api_key=settings.TRANSBANK_CONFIG['WEBPAY_API_KEY'],
         integration_type=settings.TRANSBANK_CONFIG['WEBPAY_ENVIRONMENT']
     ))
 
+    # Crear transacción
     response = tx.create(
         buy_order=buy_order,
         session_id=request.session.session_key,
         amount=orden.monto_total,
-        return_url=request.build_absolute_uri(reverse('webpay_plus_commit')))
+        return_url=request.build_absolute_uri(reverse('webpay_plus_commit'))
+    )
     
-    # Guardar referencia completa
+    # Guardar token en orden
     orden.token_ws = response['token']
     orden.save()
     request.session['orden_id'] = orden.id

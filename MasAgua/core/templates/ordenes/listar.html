@@ -10,6 +10,7 @@
                 <tr>
                     {% if es_admin %}<th>Cliente</th>{% endif %}
                     <th>N° Orden</th>
+                    <th>Dirección</th>
                     <th>Fecha</th>
                     <th>Estado</th>
                     <th>Total</th>
@@ -23,6 +24,7 @@
                     <td>{{ orden.usuario.get_full_name|default:orden.usuario.username }}</td>
                     {% endif %}
                     <td>#{{ orden.id }}</td>
+                    <td>{{ orden.direccion }}</td>
                     <td>{{ orden.fecha|date:"d/m/Y H:i" }}</td>
                     <td>
                         <span class="badge 
