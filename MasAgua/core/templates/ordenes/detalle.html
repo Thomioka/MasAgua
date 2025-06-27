@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Detalle de Orden #{{ orden.id }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Información del Cliente</h5>
+                    <p><strong>Nombre:</strong> {{ orden.usuario.get_full_name }}</p>
+                    <p><strong>Email:</strong> {{ orden.usuario.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Detalles de la Orden</h5>
+                    <p><strong>Fecha:</strong> {{ orden.fecha|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Estado:</strong> 
+                        <span class="badge 
+                            {% if orden.estado == 'pagado' %}bg-success
+                            {% elif orden.estado == 'pendiente' %}bg-warning
+                            {% else %}bg-danger{% endif %}">
+                            {{ orden.get_estado_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <h5>Productos</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.producto.nombre }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>${{ item.precio }}</td>
+                        <td>${{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">Total</th>
+                        <th>${{ orden.monto_total }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'listar_ordenes' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

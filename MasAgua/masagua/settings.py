@@ -76,3 +76,10 @@ LOGOUT_REDIRECT_URL = '/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+TRANSBANK_CONFIG = {
+    'WEBPAY_COMMERCE_CODE': '597055555532',  # Código de comercio TEST
+    'WEBPAY_API_KEY': '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C',  # API Key TEST
+    'WEBPAY_ENVIRONMENT': 'TEST',  # Ambiente de pruebas
+    'WEBPAY_RETURN_URL': 'https://5ede-2803-c600-d10f-e34c-b9ef-f850-bc6f-4bd0.ngrok-free.app/webpay/commit',  # Reemplaza con tu URL de ngrok
+}

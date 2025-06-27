@@ -24,4 +24,14 @@ urlpatterns = [
     path('carrito/', views.ver_carrito, name='ver_carrito'),
     path('eliminar-carrito/<int:item_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
 
+    #Pagos
+    path('carrito/pagar/', views.procesar_pago_webpay, name='procesar_pago'),
+    
+    path('webpay/create/', views.webpay_plus_create, name='webpay_plus_create'),
+    path('webpay/commit/', views.webpay_plus_commit, name='webpay_plus_commit'),
+
+    #ordenes/pedidos
+    path('ordenes/', views.listar_ordenes, name='listar_ordenes'),
+    path('ordenes/<int:orden_id>/', views.detalle_orden, name='detalle_orden'),
+
 ]

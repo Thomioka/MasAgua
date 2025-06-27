@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+
+<h1>¡Pago exitoso!</h1>
+<p>Orden #{{ orden.id }} - ${{ orden.monto_total }}</p>
+<p class="alert alert-info">
+    Tu orden está en revisión. Un bodeguero la aprobará pronto.
+</p>
+
+
+<a href="/">Volver al inicio</a>
+
+{% endblock %}

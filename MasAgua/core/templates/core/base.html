@@ -73,6 +73,9 @@
                             Carrito <span class="badge bg-light text-dark">{{ user.carrito.items.count }}</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listar_ordenes' %}">Pedidos</a>
+                    </li>
                     {% endif %}
 
                     <!-- Menú solo para CLIENTE -->

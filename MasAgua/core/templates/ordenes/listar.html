@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if es_admin %}Todas las Órdenes{% else %}Mis Órdenes{% endif %}</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    {% if es_admin %}<th>Cliente</th>{% endif %}
+                    <th>N° Orden</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes %}
+                <tr>
+                    {% if es_admin %}
+                    <td>{{ orden.usuario.get_full_name|default:orden.usuario.username }}</td>
+                    {% endif %}
+                    <td>#{{ orden.id }}</td>
+                    <td>{{ orden.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if orden.estado == 'pagado' %}bg-success
+                            {% elif orden.estado == 'pendiente' %}bg-warning
+                            {% else %}bg-danger{% endif %}">
+                            {{ orden.get_estado_display }}
+                        </span>
+                    </td>
+                    <td>${{ orden.monto_total }}</td>
+                    <td>
+                        <a href="{% url 'detalle_orden' orden.id %}" 
+                           class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if es_admin %}6{% else %}5{% endif %}" class="text-center">
+                        No hay órdenes registradas
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

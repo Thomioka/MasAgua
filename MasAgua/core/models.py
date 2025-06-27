@@ -115,18 +115,36 @@ class Contrato(models.Model):
     
 #CUANDO SE PAGA CON WEBPAY SE CREA UNA ORDEN
 class Orden(models.Model):
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('pagado', 'Pagado'),
+        ('cancelado', 'Cancelado'),
+    ]
+    
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now_add=True)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
-    estado = models.CharField(max_length=20, default='pendiente')
+    monto_total = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
+    buy_order = models.CharField(max_length=40, unique=True, blank=True, null=True)  # BO_123456
+    token_ws = models.CharField(max_length=100, blank=True, null=True)  # Token de Transbank
     
     def __str__(self):
         return f"Orden #{self.id} - {self.usuario.username}"
+
+class ItemOrden(models.Model):
+    orden = models.ForeignKey(Orden, related_name='items', on_delete=models.CASCADE)
+    producto = models.ForeignKey('Producto', on_delete=models.PROTECT)
+    cantidad = models.PositiveIntegerField()
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def subtotal(self):
+        return self.precio * self.cantidad
 #CARRITO DE COMPRAS
 class Carrito(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     confirmado = models.BooleanField(default=False)
-    orden_relacionada = models.ForeignKey(Orden, null=True, blank=True, on_delete=models.SET_NULL)
+    # --- Campo nuevo ---
+    orden_relacionada = models.ForeignKey(Orden, null=True, blank=True, on_delete=models.SET_NULL)  # Relación con la orden
 
     def __str__(self):
         return f"Carrito de {self.usuario.username}"
